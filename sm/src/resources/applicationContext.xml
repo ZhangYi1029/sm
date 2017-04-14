@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/aop 
+        http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+	<!-- spring提供的自动扫描机制：@Controller,@Service,@Repository,@Component -->
+	<context:component-scan base-package="org.com.yi.spring_mybatis" />
+
+	<context:property-placeholder location="classpath*:mysql.properties"
+		ignore-unresolvable="true" />
+
+	<!--配置web数据源（在WEB项目中，一般数据源特指数据库） 该数据源只适合开发或者测试，不能用来商业生产环境，如果需要商业生产，难就可以使用C3P0，或者DBCP的连接池 -->
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+		<property name="driverClassName" value="${driverClassName}"></property>
+		<property name="url" value="${url}"></property>
+		<property name="username" value="${root}"></property>
+		<property name="password" value="${123456}"></property>
+
+
+
+	</bean>
+
+
+	<!--配置SessionFactory 来至于mybatis-spring.jar -->
+
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource"></property>
+
+		<!-- 给类取类别名 -->
+		<property name="typeAliasesPackage"
+			value="org.com.yi.spring_mybatis.usermag.beans;org.com.yi.spring_mybatis.relationmag.beans;org.com.yi.spring_mybatis.game.beans"></property>
+
+
+	</bean>
+
+	<!-- 第三步配置SQL隐射器的扫描 -->
+	<bean id="mapperScanner" class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage"
+			value="org.com.yi.spring_mybatis.usermag.dao.mapper;org.com.yi.spring_mybatis.relationmag.mapper;org.com.yi.spring_mybatis.game.mapper"></property>
+
+		<property name="sqlSessionFactory" value="sqlSessionFactory"></property>
+	</bean>
+
+
+	<!-- 第四部配置事务 -->
+
+	<bean id="txManage"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+
+		<property name="dataSource" ref="dataSource"></property>
+
+	</bean>
+
+
+
+
+
+
+	<aop:aspectj-autoproxy />
+
+</beans>
